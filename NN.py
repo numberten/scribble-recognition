@@ -2,7 +2,7 @@ from random import random
 from math import e
 
 def sigmoid(x):
-   return 1/(1+e^-x)
+   return 1/(1+e**-x)
 
 class NeuralNet:
    def __init__(self, number_of_neurons_per_layer):
@@ -58,7 +58,7 @@ class NeuralNet:
          for o in self.neurons[layer_index]:
             new_value += o * self.weights[layer_index][weights_counter]
             weights_counter += 1
-         self.neurons[layer_index+1][n] = new_value
+         self.neurons[layer_index+1][n] = sigmoid(new_value)
          print "now n is: " + str(self.neurons[layer_index+1][n])
       print "layer " + str(layer_index) + " finished."
             
