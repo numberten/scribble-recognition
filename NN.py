@@ -29,11 +29,11 @@ class NeuralNet:
             
    def print_net(self):
       for i in range(0,len(self.neurons)):
-         print "Layer "+ str(i) + ": " + str(self.neurons[i])
+         print "Neurons Layer "+ str(i) + ": " + str(self.neurons[i])
       for i in range(0,len(self.weights)):
-         print "Layer "+ str(i) + ": " + str(self.weights[i])
+         print "Weights Layer "+ str(i) + ": " + str(self.weights[i])
       for i in range(0,len(self.biases)):
-         print "Layer "+ str(i) + ": " + str(self.biases[i])
+         print "Biases Layer "+ str(i) + ": " + str(self.biases[i])
 
    def run(self, inputs):
       self.set_input_neurons(inputs)
@@ -63,8 +63,15 @@ class NeuralNet:
       print "layer " + str(layer_index) + " finished."
             
             
-         
+print "Making a 2,3,1 neural net." 
+a = NeuralNet([2,3,1])
 
+a.print_net()
+
+print "Running it with input: [1,1]"
+a.run([1,1])
+
+a.print_net()
 
 
 
