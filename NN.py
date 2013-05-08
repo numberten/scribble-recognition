@@ -63,49 +63,52 @@ class NeuralNet:
       if len(outputs) != len(self.neurons[len(self.neurons)-1]):
          print "This neuron requires "+ str(len(self.neurons[len(self.neurons)-1])) + " outputs."
          return
-      #Step 1: Run the neural network
-      self.run(inputs)
-      self.print_net()
-   #Step 2: Calculate delta-k for every output node k
-      delta_ks = []
-      for k in range(0,len(self.neurons[len(self.neurons)-1])):
-         ko = self.neurons[len(self.neurons)-1][k]
-         delta_ks.append(ko * (1 - ko) * (ko - outputs[k]))
-      #Step 3: Calculate delta-j for every hidden node j
-      delta_js = []
-      for i in range(1,len(self.neurons)-1):
-         delta_js.append([])
-      delta_js.append(delta_ks)
-      for i in range(len(delta_js)-2,-1,-1): 
-         weight_counter = 0
-         for j in range(0,len(self.neurons[1+i])):
-            jo = self.neurons[1+i][j]
-            summation = 0
-            for k in range(0,len(self.neurons[2+i])):
-               weightjk        = self.weights[i+1][weight_counter]
-               weight_counter += 1
-               summation      += delta_js[i+1][k] * weightjk
-            delta_js[i].append(jo * (1 - jo) * summation) 
-      #Step 4: Update the weights and biases
-      for i in range(0,len(self.weights)):
-         nshift         = 0
-         weight_counter = 0
-         output_counter = 0
-         while (weight_counter < len(self.weights[i])):
-            for j in range(0,len(delta_js[i])):
-               delta_w = -1 * alpha * delta_js[i][j] * self.neurons[i][nshift]
-               self.weights[i][weight_counter] += delta_w
-               weight_counter += 1
-            nshift += 1
-      for i in range(1,len(self.neurons)):
-         for b in range(0,len(self.biases[i])):
-            delta_b = -1 * alpha * delta_js[i-1][b]
-            self.biases[i][b] += delta_b
-      #Step 5: Profit
+      current_iteration = 0
+      while current_iteration < iterations:
+         #Step 1: Run the neural network
+         self.run(inputs)
+         self.print_net()
+         #Step 2: Calculate delta-k for every output node k
+         delta_ks = []
+         for k in range(0,len(self.neurons[len(self.neurons)-1])):
+            ko = self.neurons[len(self.neurons)-1][k]
+            delta_ks.append(ko * (1 - ko) * (ko - outputs[k]))
+         #Step 3: Calculate delta-j for every hidden node j
+         delta_js = []
+         for i in range(1,len(self.neurons)-1):
+            delta_js.append([])
+         delta_js.append(delta_ks)
+         for i in range(len(delta_js)-2,-1,-1): 
+            weight_counter = 0
+            for j in range(0,len(self.neurons[1+i])):
+               jo = self.neurons[1+i][j]
+               summation = 0
+               for k in range(0,len(self.neurons[2+i])):
+                  weightjk        = self.weights[i+1][weight_counter]
+                  weight_counter += 1
+                  summation      += delta_js[i+1][k] * weightjk
+               delta_js[i].append(jo * (1 - jo) * summation) 
+         #Step 4: Update the weights and biases
+         for i in range(0,len(self.weights)):
+            nshift         = 0
+            weight_counter = 0
+            output_counter = 0
+            while (weight_counter < len(self.weights[i])):
+               for j in range(0,len(delta_js[i])):
+                  delta_w = -1 * alpha * delta_js[i][j] * self.neurons[i][nshift]
+                  self.weights[i][weight_counter] += delta_w
+                  weight_counter += 1
+               nshift += 1
+         for i in range(1,len(self.neurons)):
+            for b in range(0,len(self.biases[i])):
+               delta_b = -1 * alpha * delta_js[i-1][b]
+               self.biases[i][b] += delta_b
+         #Step 5: Profit
+         current_iteration += 1
       print "finished training neural net"
 
-            
-            
+
+
 
 
 
