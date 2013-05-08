@@ -24,8 +24,6 @@ class NeuralNet:
          if i != 0:
             for j in range(0,number_of_neurons_per_layer[i]):
                self.biases[i].append(random())
-      #zip neurons and weights into net
-      self.net = zip(self.neurons, self.weights)
             
    def print_net(self):
       for i in range(0,len(self.neurons)):
@@ -37,7 +35,6 @@ class NeuralNet:
 
    def run(self, inputs):
       self.set_input_neurons(inputs)
-      #self.print_net()
       for i in range(0,len(self.neurons)-1): 
          self.feed_forward(i)
       print "Finished running the neuralnetwork."
@@ -49,20 +46,14 @@ class NeuralNet:
          self.neurons[0][i] = inputs[i]        
 
    def feed_forward(self, layer_index):
-      #n is each neuron in the next layer
       weights_counter = 0
       for n in range(0,len(self.neurons[layer_index+1])):
-#         print "n was: "+ str(self.neurons[layer_index+1][n])
          new_value = 0
-         #o is the output of every node in the current layer
          for o in self.neurons[layer_index]:
             new_value += o * self.weights[layer_index][weights_counter]
             weights_counter += 1
          new_value += self.biases[layer_index+1][n]
          self.neurons[layer_index+1][n] = sigmoid(new_value)
- #        print "now n is: " + str(self.neurons[layer_index+1][n])
-#      print "layer " + str(layer_index) + " finished."
-
 
    def train(self, inputs, outputs, alpha, iterations, error):
       if len(inputs) != len(self.neurons[0]):
@@ -74,7 +65,8 @@ class NeuralNet:
          return
       #Step 1: Run the neural network
       self.run(inputs)
-      #Step 2: Calculate delta-k for every output node k
+      self.print_net()
+   #Step 2: Calculate delta-k for every output node k
       delta_ks = []
       for k in range(0,len(self.neurons[len(self.neurons)-1])):
          ko = self.neurons[len(self.neurons)-1][k]
@@ -83,9 +75,8 @@ class NeuralNet:
       delta_js = []
       for i in range(1,len(self.neurons)-1):
          delta_js.append([])
-         #delta-j for last hidden layer
       delta_js.append(delta_ks)
-      for i in range(len(delta_js)-2,-1,-1): #i starts from highest index and goes to 0
+      for i in range(len(delta_js)-2,-1,-1): 
          weight_counter = 0
          for j in range(0,len(self.neurons[1+i])):
             jo = self.neurons[1+i][j]
@@ -94,9 +85,6 @@ class NeuralNet:
                weightjk        = self.weights[i+1][weight_counter]
                weight_counter += 1
                summation      += delta_js[i+1][k] * weightjk
-            print "i: "+ str(i)
-            print "j: "+ str(j)
-            print "length of delta_js: " + str(len(delta_js))
             delta_js[i].append(jo * (1 - jo) * summation) 
       #Step 4: Update the weights and biases
       for i in range(0,len(self.weights)):
@@ -118,20 +106,6 @@ class NeuralNet:
 
             
             
-print "Making a 2,3,1 neural net." 
-a = NeuralNet([2,3,1])
-print "Training the net......"
-a.train([1,1],[2], 0,0,0)
-
-
-
-
-
-
-
-
-
-
 
 
 
