@@ -6,6 +6,9 @@ def sigmoid(x):
 
 class NeuralNet:
    def __init__(self, number_of_neurons_per_layer):
+      self.global_i = 0
+      self.f = open('error_data', 'w')
+      self.current_error = 0
       self.neurons = []
       self.weights = []
       self.biases  = []
@@ -37,7 +40,7 @@ class NeuralNet:
       self.set_input_neurons(inputs)
       for i in range(0,len(self.neurons)-1): 
          self.feed_forward(i)
-      print "Finished running the neuralnetwork."
+      #print "Finished running the neuralnetwork."
 
    def set_input_neurons(self, inputs):
       if len(self.neurons[0]) != len(inputs):
@@ -56,62 +59,85 @@ class NeuralNet:
          self.neurons[layer_index+1][n] = sigmoid(new_value)
 
    def train(self, inputs, outputs, alpha, iterations, error):
-      if len(inputs) != len(self.neurons[0]):
-         print "This neuron requires "+ str(len(self.neurons[0])) + " inputs."
+      if len(inputs) != len(outputs):
+         print "Must have the same number of inputs and outputs."
          return
-
-      if len(outputs) != len(self.neurons[len(self.neurons)-1]):
-         print "This neuron requires "+ str(len(self.neurons[len(self.neurons)-1])) + " outputs."
-         return
-      current_iteration = 0
-      while current_iteration < iterations:
-         #Step 1: Run the neural network
-         self.run(inputs)
-         self.print_net()
-         #Step 2: Calculate delta-k for every output node k
-         delta_ks = []
-         for k in range(0,len(self.neurons[len(self.neurons)-1])):
-            ko = self.neurons[len(self.neurons)-1][k]
-            delta_ks.append(ko * (1 - ko) * (ko - outputs[k]))
-         #Step 3: Calculate delta-j for every hidden node j
-         delta_js = []
-         for i in range(1,len(self.neurons)-1):
-            delta_js.append([])
-         delta_js.append(delta_ks)
-         for i in range(len(delta_js)-2,-1,-1): 
-            weight_counter = 0
-            for j in range(0,len(self.neurons[1+i])):
-               jo = self.neurons[1+i][j]
-               summation = 0
-               for k in range(0,len(self.neurons[2+i])):
-                  weightjk        = self.weights[i+1][weight_counter]
-                  weight_counter += 1
-                  summation      += delta_js[i+1][k] * weightjk
-               delta_js[i].append(jo * (1 - jo) * summation) 
-         #Step 4: Update the weights and biases
-         for i in range(0,len(self.weights)):
-            nshift         = 0
-            weight_counter = 0
-            output_counter = 0
-            while (weight_counter < len(self.weights[i])):
-               for j in range(0,len(delta_js[i])):
-                  delta_w = -1 * alpha * delta_js[i][j] * self.neurons[i][nshift]
-                  self.weights[i][weight_counter] += delta_w
-                  weight_counter += 1
-               nshift += 1
-         for i in range(1,len(self.neurons)):
-            for b in range(0,len(self.biases[i])):
-               delta_b = -1 * alpha * delta_js[i-1][b]
-               self.biases[i][b] += delta_b
-         #Step 5: Profit
+      for i in inputs:
+         if len(i) != len(self.neurons[0]):
+            print "This network requires " + str(len(self.neurons[0])) + " inputs."
+            return
+      for o in outputs:
+         if len(o) != len(self.neurons[len(self.neurons)-1]):
+            print "This network requires " + str(len(self.neurons[len(self.neurons)-1])) + " outputs."
+            return
+      current_iteration    = 0
+      self.current_error   = error + 1
+      while current_iteration < iterations and self.current_error > error:
+         for q in range(0,len(inputs)):
+            #Step 1: Run the neural network
+            self.run(inputs[q])
+            #self.print_net()
+            #Step 2: Calculate delta-k for every output node k
+            delta_ks = []
+            for k in range(0,len(self.neurons[len(self.neurons)-1])):
+               ko = self.neurons[len(self.neurons)-1][k]
+               delta_ks.append(ko * (1 - ko) * (ko - outputs[q][k]))
+            #Step 3: Calculate delta-j for every hidden node j
+            delta_js = []
+            for i in range(1,len(self.neurons)-1):
+               delta_js.append([])
+            delta_js.append(delta_ks)
+            for i in range(len(delta_js)-2,-1,-1): 
+               weight_counter = 0
+               for j in range(0,len(self.neurons[1+i])):
+                  jo = self.neurons[1+i][j]
+                  summation = 0
+                  for k in range(0,len(self.neurons[2+i])):
+                     weightjk        = self.weights[i+1][weight_counter]
+                     weight_counter += 1
+                     summation      += delta_js[i+1][k] * weightjk
+                  delta_js[i].append(jo * (1 - jo) * summation) 
+            #Step 4: Update the weights and biases
+            for i in range(0,len(self.weights)):
+               nshift         = 0
+               weight_counter = 0
+               output_counter = 0
+               while (weight_counter < len(self.weights[i])):
+                  for j in range(0,len(delta_js[i])):
+                     delta_w = -1 * alpha * delta_js[i][j] * self.neurons[i][nshift]
+                     self.weights[i][weight_counter] += delta_w
+                     weight_counter += 1
+                  nshift += 1
+            for i in range(1,len(self.neurons)):
+               for b in range(0,len(self.biases[i])):
+                  delta_b = -1 * alpha * delta_js[i-1][b]
+                  self.biases[i][b] += delta_b
+            #Step 5: Profit
+         self.calculate_error(inputs,outputs)
          current_iteration += 1
-      print "finished training neural net"
+#      print "finished training neural net"
+
+   def calculate_error(self, inputs, outputs):
+      self.current_error = 0
+      summ = 0
+      for i in range(0,len(inputs)):
+         self.run(inputs[i])
+         for o in range(0,len(outputs[i])):
+            summ += (self.neurons[len(self.neurons)-1][o] - outputs[i][o])**2
+      self.current_error = 0.5 * summ
+      self.f.write(str(self.current_error)+','+str(self.global_i)+'\n')
+      self.global_i += 1
 
 
 
 
 
 
+#print "Creating a [2,2,1] neural network."
+#print "Training network with AND gate examples."
+#print "alpha = 0.1, max iterations = 500, error = 0.05"
+a = NeuralNet([2,2,1])
+a.train([[1,1],[0,0],[1,0],[0,1]], [[1],[0],[0],[0]], 0.1, 500, 0.05)
 
 
 
