@@ -7,7 +7,7 @@ def sigmoid(x):
 class NeuralNet:
    def __init__(self, number_of_neurons_per_layer):
       self.global_i = 0
-      self.f = open('error_data', 'w')
+      self.f = open('error_data.csv', 'w')
       self.current_error = 0
       self.neurons = []
       self.weights = []
