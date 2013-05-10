@@ -21,12 +21,16 @@ class NeuralNet:
          self.weights.append([])
          if i+1 != len(number_of_neurons_per_layer):
             for j in range(0,number_of_neurons_per_layer[i]*number_of_neurons_per_layer[i+1]):
-               self.weights[i].append(random())
+               self.weights[i].append((random()*2)-1)
          #initialize biases for non-input layers
          self.biases.append([])
          if i != 0:
             for j in range(0,number_of_neurons_per_layer[i]):
-               self.biases[i].append(random())
+               self.biases[i].append((random()*2)-1)
+
+   def printo(self):
+      for i in self.neurons[len(self.neurons)-1]:
+         print "Output -> " + str(i)
             
    def print_net(self):
       for i in range(0,len(self.neurons)):
@@ -72,7 +76,18 @@ class NeuralNet:
             return
       current_iteration    = 0
       self.current_error   = error + 1
-      while current_iteration < iterations and self.current_error > error:
+      while True:
+         if current_iteration >= iterations:
+            print "finished training neural net"
+            print "error: "+ str(self.current_error)
+            print "max iteration reached."
+            return
+         if self.current_error <= error:
+            print "finished training neural net"
+            print "error: "+ str(self.current_error)
+            print "current error less than target error."
+            print "iterations: "+ str(current_iteration)
+            return
          for q in range(0,len(inputs)):
             #Step 1: Run the neural network
             self.run(inputs[q])
@@ -115,7 +130,6 @@ class NeuralNet:
             #Step 5: Profit
          self.calculate_error(inputs,outputs)
          current_iteration += 1
-#      print "finished training neural net"
 
    def calculate_error(self, inputs, outputs):
       self.current_error = 0
@@ -133,11 +147,24 @@ class NeuralNet:
 
 
 
-#print "Creating a [2,2,1] neural network."
-#print "Training network with AND gate examples."
-#print "alpha = 0.1, max iterations = 500, error = 0.05"
+print "Creating a [2,2,1] neural network."
+print "Training network with XOR gate examples."
+print "alpha = 0.03, max iterations = 150000, error = 0.08"
 a = NeuralNet([2,2,1])
-a.train([[1,1],[0,0],[1,0],[0,1]], [[1],[0],[0],[0]], 0.1, 500, 0.05)
+a.train([[1,1],[0,0],[1,0],[0,1]], [[0],[0],[1],[1]], 0.03, 150000, 0.08)
+
+print "[1,1]"
+a.run([1,1])
+a.printo()
+print "[0,0]"
+a.run([0,0])
+a.printo()
+print "[1,0]"
+a.run([1,0])
+a.printo()
+print "[0,1]"
+a.run([0,1])
+a.printo()
 
 
 
