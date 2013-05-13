@@ -147,10 +147,10 @@ class NeuralNet:
 
 
 
-print "Creating a [2,2,1] neural network."
+print "Creating a [2,2,3,1] neural network."
 print "Training network with XOR gate examples."
 print "alpha = 0.03, max iterations = 150000, error = 0.08"
-a = NeuralNet([2,2,1])
+a = NeuralNet([2,2,3,1])
 a.train([[1,1],[0,0],[1,0],[0,1]], [[0],[0],[1],[1]], 0.03, 150000, 0.08)
 
 print "[1,1]"
