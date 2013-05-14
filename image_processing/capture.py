@@ -1,7 +1,6 @@
 import Image
 
 im = Image.open("../images/arial_characters.png")
-#im = Image.open("images/Penguin03black.gif")
 
 
 def displayImage(img):
@@ -91,6 +90,7 @@ def collectCharacters(img):
       point = (myx, myy)
       cluster = getCluster(point, img)
       if len(cluster) > 0:
+         print displayImage(im)
          mnm = maxAndmins(cluster)
          print str(mnm)
          newImage = img.crop(mnm)
@@ -101,52 +101,17 @@ def collectCharacters(img):
          print displayImage(newImage)
          print "Name of character:"
          name = raw_input()
-         #hard coded manual expansion for dotted multi-cluster characters
-         #while name[0:6] == 'expand':
          while name == 'grab':
             (t1, t2, t3, t4) = mnm
-            #if name[7:len(name)] == 'up':
-            #   mnm = (t1, t2-1, t3, t4)
-            #   newImage = img.crop(mnm)
-            #   newImage.load()
-            #   print "Displaying Image"
-            #   print displayImage(newImage)
-            #   print "Name of character:"
-            #   name = raw_input()
-            #elif name[7:len(name)] == 'down':
-            #   mnm = (t1, t2, t3, t4+1)
-            #   newImage = img.crop(mnm)
-            #   newImage.load()
-            #   print "Displaying Image"
-            #   print displayImage(newImage)
-            #   print "Name of character:"
-            #   name = raw_input()
-            #elif name[7:len(name)] == 'left':
-            #   mnm = (t1-1, t2, t3, t4)
-            #   newImage = img.crop(mnm)
-            #   newImage.load()
-            #   print "Displaying Image"
-            #   print displayImage(newImage)
-            #   print "Name of character:"
-            #   name = raw_input()
-            #elif name[7:len(name)] == 'right':
-            #   mnm = (t1, t2, t3+1, t4)
-            #   newImage = img.crop(mnm)
-            #   newImage.load()
-            #   print "Displaying Image"
-            #   print displayImage(newImage)
-            #   print "Name of character:"
-            #   name = raw_input()
-            #if name[0:4] == 'grab':
             print "How far on x-axis from left hand side?"
             dx = input()
             print "How far on y-axis from bottom?"
             dy = input()
-            newpoint = expandPos(dx,dy,point)
+            newpoint = expandPos(dx,dy,(t1,t4))
             newCluster = getCluster(newpoint, img)
+            print "Cluster length: "+  str(len(newCluster))
             cluster += newCluster
             mnm = maxAndmins(cluster)
-            print str(mnm)
             newImage = img.crop(mnm)
             print "new size: "+ str(newImage.size[0])
             print "new size2: "+ str(newImage.size[1])
@@ -155,9 +120,6 @@ def collectCharacters(img):
             print displayImage(newImage)
             print "Name of character:"
             name = raw_input()
-            #else:
-            #   print "Hrm?\nName of character:"
-            #   name = raw_input()
          name += '.png'
          newImage.save(name)
          eraseCluster(cluster, img)
@@ -174,11 +136,7 @@ def collectCharacters(img):
             myx += 1
             myy += 1
 
-print displayImage(im)
 
 collectCharacters(im)
-#class Character:
    
-#   def __init__(self, init):
-      #init.
 
