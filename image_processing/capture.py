@@ -1,6 +1,6 @@
 import Image
+from os import listdir
 
-im = Image.open("../images/arial_characters.png")
 
 
 def displayImage(img):
@@ -136,7 +136,37 @@ def collectCharacters(img):
             myx += 1
             myy += 1
 
+def resize(fileName, (nx,ny)):
+   img = Image.open(fileName)
+   newIm = Image.new(img.mode, (nx,ny), 255)
+   (ix,iy) = img.size
+   while (ix*2 <= nx and iy*2 <= ny):
+      img = img.resize((ix*2,iy*2), Image.ANTIALIAS)
+      #(ix,iy) = img.size
+      ix = ix*2
+      iy = iy*2
+      print str((ix,iy))
+   while (ix/2 >= nx and iy/2 >= ny):
+      img = img.resize((ix/2,iy/2), Image.ANTIALIAS)
+      (ix,iy) = img.size
+   newIm.paste(img, (15,15), mask = alpha)
+   newIm.save('test.png')
+   img.save('test2.png')
+   
+   #img.thumbnail(newSize, Image.ANTIALIAS)
+   #img.save(fileName)
 
-collectCharacters(im)
+#collectCharacters(im)
+
+#im = Image.open("../images/arial_characters.png")
+
+#resize("../images/arial_characters/arial_0.png", (100,100))
+
+path = '../images/arial_characters/'
+resize(path+'0.png', (100,100))
+#xs = listdir(path)
+#for i in xs:
+#   im = Image.open(path+i)
+#   print i+': '+str(im.size)
    
 
