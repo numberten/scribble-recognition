@@ -55,6 +55,30 @@ def getCluster(xy, img):
          i += 1
    return cluster
 
+def firstCluster(img):
+   x = img.size[0]
+   y = img.size[1]
+   myx = 0
+   myy = 0
+   i = 0
+   while (myx != x and myy != y):
+      point = (myx, myy)
+      cluster = getCluster(point, img)
+      if len(cluster) > 0:
+         return cluster
+      if (myx < x-1):
+         i += 1
+         myx += 1
+      elif (myy < y-1):
+         i += 1
+         myx = 0
+         myy += 1
+      else:
+         if (myx == x-1 and myy == y-1):
+            i += 1
+            myx += 1
+            myy += 1
+
 def eraseCluster(cluster, img):
    for p in cluster:
       img.putpixel(p, 0)
@@ -136,9 +160,27 @@ def collectCharacters(img):
             myx += 1
             myy += 1
 
+def mypaste(path, (nx,ny)):
+   resize(path+'.png', (nx,ny))
+   img_old = Image.open(path+'.png')
+   cluster = firstCluster(img_old)
+   (minx, miny, maxx, maxy) = maxAndmins(cluster) 
+   lx = maxx - minx
+   ly = maxy - miny
+   dx = (nx-lx)/2
+   print 'dx: '+str(dx)
+   dy = (ny-ly)/2
+   print 'dy: '+str(dy)
+   cluster = map(lambda (x,y): (x+dx,y+dy), cluster)
+   new = Image.new(img_old.mode, (nx,ny), 255)
+   for c in cluster:
+      new.putpixel(c, 10)
+   new.save(path+'.2png')
+   
+
+  
 def resize(fileName, (nx,ny)):
    img = Image.open(fileName)
-   newIm = Image.new(img.mode, (nx,ny), 255)
    (ix,iy) = img.size
    while (ix*2 <= nx and iy*2 <= ny):
       img = img.resize((ix*2,iy*2), Image.ANTIALIAS)
@@ -149,8 +191,6 @@ def resize(fileName, (nx,ny)):
    while (ix/2 >= nx and iy/2 >= ny):
       img = img.resize((ix/2,iy/2), Image.ANTIALIAS)
       (ix,iy) = img.size
-   newIm.paste(img, (15,15), mask = alpha)
-   newIm.save('test.png')
    img.save('test2.png')
    
    #img.thumbnail(newSize, Image.ANTIALIAS)
@@ -163,7 +203,18 @@ def resize(fileName, (nx,ny)):
 #resize("../images/arial_characters/arial_0.png", (100,100))
 
 path = '../images/arial_characters/'
-resize(path+'0.png', (100,100))
+#resize(path+'0.png', (100,100))
+#img = Image.open('test2.png')
+img = Image.open('test2.png')
+mypaste(img, (100,100))
+print 'done!'
+#print str(img.mode)
+#a = Image.new(img.mode, (100,100), 255)
+#a.save('test3.png')
+#a = Image.open('test3.png')
+#a.paste(img, (0,0))
+#a.save('test3.png')
+#a.save('test3.png')
 #xs = listdir(path)
 #for i in xs:
 #   im = Image.open(path+i)
