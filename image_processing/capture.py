@@ -160,9 +160,9 @@ def collectCharacters(img):
             myx += 1
             myy += 1
 
-def mypaste(path, (nx,ny)):
-   resize(path+'.png', (nx,ny))
-   img_old = Image.open(path+'.png')
+def mypaste(fileName, (nx,ny)):
+   resize(fileName, (nx,ny))
+   img_old = Image.open(fileName)
    cluster = firstCluster(img_old)
    (minx, miny, maxx, maxy) = maxAndmins(cluster) 
    lx = maxx - minx
@@ -175,7 +175,7 @@ def mypaste(path, (nx,ny)):
    new = Image.new(img_old.mode, (nx,ny), 255)
    for c in cluster:
       new.putpixel(c, 10)
-   new.save(path+'.2png')
+   new.save(fileName)
    
 
   
@@ -191,23 +191,34 @@ def resize(fileName, (nx,ny)):
    while (ix/2 >= nx and iy/2 >= ny):
       img = img.resize((ix/2,iy/2), Image.ANTIALIAS)
       (ix,iy) = img.size
-   img.save('test2.png')
+   img.save(fileName)
    
    #img.thumbnail(newSize, Image.ANTIALIAS)
    #img.save(fileName)
 
+
 #collectCharacters(im)
 
-#im = Image.open("../images/arial_characters.png")
+#im = Image.open("arial_0.png")
+path = '../images/verdana_characters/'
+files = listdir(path)
+#print str(files)
+for i in files:
+   mypaste(path+i, (100,100))
+print 'All done!' 
+
+#= resize('arial_0.png', (100,100))
+
+#collectCharacters(im)
 
 #resize("../images/arial_characters/arial_0.png", (100,100))
 
-path = '../images/arial_characters/'
+#path = '../images/arial_characters/'
 #resize(path+'0.png', (100,100))
 #img = Image.open('test2.png')
-img = Image.open('test2.png')
-mypaste(img, (100,100))
-print 'done!'
+#img = Image.open('test2.png')
+#mypaste(img, (100,100))
+#print 'done!'
 #print str(img.mode)
 #a = Image.new(img.mode, (100,100), 255)
 #a.save('test3.png')
