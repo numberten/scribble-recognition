@@ -1,4 +1,5 @@
 from random import random
+from ast import literal_eval
 from math import e
 
 def sigmoid(x):
@@ -142,9 +143,20 @@ class NeuralNet:
       self.f.write(str(self.current_error)+','+str(self.global_i)+'\n')
       self.global_i += 1
 
+   def save_network(self,savefile):   
+      f = open(savefile, 'w')
+      s = "Neurons\n"+str(self.neurons)+"\nWeights\n"+str(self.weights)+"\nBiases\n"+str(self.biases)+"\n"
+      f.write(s)
 
-
-
+def load_network(savefile):
+   network = NeuralNet([])
+   f = open(savefile, 'r+')
+   lines = f.readlines()
+   network.neurons = literal_eval(lines[1])
+   network.weights = literal_eval(lines[3])
+   network.biases  = literal_eval(lines[5])
+   f.close
+   return network
 
 
 print "Creating a [2,2,3,1] neural network."
@@ -165,7 +177,6 @@ a.printo()
 print "[0,1]"
 a.run([0,1])
 a.printo()
-
 
 
 

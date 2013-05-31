@@ -31,8 +31,8 @@ def read_receptors(savefile):
    lines = f.readlines()
    for i in lines:
       receptors.append(tupify(i))
+   f.close
    return receptors
-   #save_receptors(receptors,savefile)
 
 def apply_receptors_to_directory(receptor_path, img_dir):
    files = listdir(img_dir)   
