@@ -78,22 +78,34 @@ def activate_receptor(img, points):
    current_y = y1
    if x_rec:
       for i in range(y1,y2+1):
-         if img.getpixel((current_x,i)) > 0:
-            print "True at "+str((current_x,i))
-            print str(img.getpixel((current_x,i)))
+         if img.getpixel((current_x,i)) == 10:
             return True
    else:
       for i in range(x1,x2+1):
-         if img.getpixel((i,current_y)) > 0:
-            print "True at "+str((i,current_y))
-            print str(img.getpixel((i,current_y)))
+         if img.getpixel((i,current_y)) == 10:
             return True
    return False
+"""
+def displayImage(img):
+   x = img.size[0]
+   y = img.size[1]
+   s = ''
+   for i in range(0,y):
+      s = s + '\n'
+      for j in range(0,x):
+         z = img.getpixel((j,i))
+         print "z:"+str(z)
+         if z == 10:
+            s = s + '#'
+         else:
+            s = s + ' '
+   return s
+"""
 
 img = Image.open('arial_a.png')
 generate_receptors(img, 'receptors.txt',10)
-#generate_receptors(img, 'receptors.txt', 100)
 r = read_receptors('receptors.txt')
+r.append(((0,0),(0,0)))
 z = [activate_receptor(img, i) for i in r]
 z = filter(lambda x:x==False, z)
 print str(z)
