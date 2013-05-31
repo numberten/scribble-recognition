@@ -158,7 +158,7 @@ def load_network(savefile):
    f.close
    return network
 
-
+"""
 print "Creating a [2,2,3,1] neural network."
 print "Training network with XOR gate examples."
 print "alpha = 0.03, max iterations = 150000, error = 0.08"
@@ -177,7 +177,7 @@ a.printo()
 print "[0,1]"
 a.run([0,1])
 a.printo()
-
+"""
 
 
 

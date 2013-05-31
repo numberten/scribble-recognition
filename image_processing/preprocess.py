@@ -169,6 +169,7 @@ def matrix_entropy(matrix):
       fitness.append(calculate_entropy(r[1:len(r)]))
    return fitness
       
+#generate 10k receptor dataset
 """   
 img = Image.open('arial_a.png')
 generate_receptors(img, 'receptors.txt',5000)
@@ -183,7 +184,8 @@ rx = filter(lambda (x,y): y > 0.8, rx)
 rx = map(lambda (x,y): x, rx)
 save_receptors(rx, 'iixreceptors.txt')
 """
-
+#generate 100 best receptors
+"""
 r = read_receptors('iixreceptors.txt')
 classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "!", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ".", "q", "?", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 m = quantify_receptors(r,classes)
@@ -194,4 +196,5 @@ rx.reverse()
 rx = map(lambda (x,y): x, rx)
 best100 = rx[0:100]
 save_receptors(best100, 'best100.txt')
+"""
 
