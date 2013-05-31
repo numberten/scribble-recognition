@@ -201,11 +201,11 @@ def resize(fileName, (nx,ny)):
 
 #im = Image.open("arial_0.png")
 path = '../images/verdana_characters/'
-files = listdir(path)
+#files = listdir(path)
 #print str(files)
-for i in files:
-   mypaste(path+i, (100,100))
-print 'All done!' 
+#for i in files:
+#   mypaste(path+i, (100,100))
+#print 'All done!' 
 
 #= resize('arial_0.png', (100,100))
 
