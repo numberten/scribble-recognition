@@ -169,26 +169,29 @@ def matrix_entropy(matrix):
       fitness.append(calculate_entropy(r[1:len(r)]))
    return fitness
       
-   
-
+"""   
+img = Image.open('arial_a.png')
+generate_receptors(img, 'receptors.txt',5000)
+print "10k receptors generated"
 r = read_receptors('receptors.txt')
 classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "!", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ".", "q", "?", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 m = quantify_receptors(r,classes)
+print "10k receptors quantified"
 fitness = matrix_entropy(m)
 rx = zip(r,fitness)
 rx = filter(lambda (x,y): y > 0.8, rx)
 rx = map(lambda (x,y): x, rx)
 save_receptors(rx, 'iixreceptors.txt')
-#print str(m[0])
-#print str(calculate_entropy(m[0][1:len(m[0])]))
-#print str(m[1])
-#print str(calculate_entropy(m[1][1:len(m[1])]))
-#print str(m[2])
-#print str(calculate_entropy(m[2][1:len(m[2])]))
+"""
 
-#img = Image.open('arial_a.png')
-#generate_receptors(img, 'receptors.txt',1000)
-#r = read_receptors('receptors.txt')
-#z = [activate_receptor(img, i) for i in r]
-         
+r = read_receptors('iixreceptors.txt')
+classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "!", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ".", "q", "?", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+m = quantify_receptors(r,classes)
+fitness = matrix_entropy(m)
+rx = zip(r,fitness)
+rx.sort(key=lambda tup: tup[1])
+rx.reverse()
+rx = map(lambda (x,y): x, rx)
+best100 = rx[0:100]
+save_receptors(best100, 'best100.txt')
 
