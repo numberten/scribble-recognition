@@ -2,6 +2,7 @@ from random import randrange as rr
 import Image
 from os import listdir
 from re import findall as findall
+from math import log as log
 
 
 def generate_receptors(img, savefile, x):
@@ -67,9 +68,9 @@ def new_y_receptor(img):
    end   = (maxx,my_y)
    return (start,end)
 
-def activate_receptor(img, points):
+def activate_receptor(img, receptor):
    activated = False
-   ((x1,y1),(x2,y2)) = points
+   ((x1,y1),(x2,y2)) = receptor
    if x1 == x2:
       x_rec = True
    else:
@@ -85,34 +86,109 @@ def activate_receptor(img, points):
          if img.getpixel((i,current_y)) == 10:
             return True
    return False
-"""
-def displayImage(img):
-   x = img.size[0]
-   y = img.size[1]
-   s = ''
-   for i in range(0,y):
-      s = s + '\n'
-      for j in range(0,x):
-         z = img.getpixel((j,i))
-         print "z:"+str(z)
-         if z == 10:
-            s = s + '#'
-         else:
-            s = s + ' '
-   return s
-"""
 
-img = Image.open('arial_a.png')
-generate_receptors(img, 'receptors.txt',10)
+def quantify_receptors(receptors, classes):
+   courier  = listdir('../images/courier_characters')
+   courier.sort()
+   times    = listdir('../images/times_new_roman_characters')
+   times.sort()
+   verdana  = listdir('../images/verdana_characters')
+   verdana.sort()
+   arial    = listdir('../images/arial_characters')
+   arial.sort()
+   comic    = listdir('../images/comic_sans_characters')
+   comic.sort()
+
+   zlist = zip(courier,times,verdana,arial,comic)
+
+   #Create empty matrix
+   matrix = []
+   for i in range(0,len(receptors)):
+      matrix.append(["R"+str(i)])
+      for j in range(0,len(zlist)):
+         matrix[i].append([])
+   
+#   print str(matrix)
+   #Fill matrix
+   for i in range(0,len(zlist)):
+      img = Image.open('../images/courier_characters/'+zlist[i][0])
+      for r in range(0,len(receptors)):
+         matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      img = Image.open('../images/times_new_roman_characters/'+zlist[i][1])
+      for r in range(0,len(receptors)):
+         matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      img = Image.open('../images/verdana_characters/'+zlist[i][2])
+      for r in range(0,len(receptors)):
+         matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      img = Image.open('../images/arial_characters/'+zlist[i][3])
+      for r in range(0,len(receptors)):
+         matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      img = Image.open('../images/comic_sans_characters/'+zlist[i][4])
+      for r in range(0,len(receptors)):
+         matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+   
+   return matrix
+   
+def inner_entropy(xs):
+   ntrue = 0 
+   for i in xs:
+      if i == True:
+         ntrue += 1
+   if ntrue == 0 or ntrue == len(xs):
+      return 0.0
+   else:
+      p1 = -(ntrue/(len(xs)*1.0))*log(ntrue/(len(xs)*1.0),2)
+      p2 = -((len(xs)-ntrue)/(len(xs)*1.0))*log((len(xs)-ntrue)/(len(xs)*1.0),2)
+      return p1+p2
+
+def outer_entropy(col):
+   xs = []
+   for i in col:
+      ntrue = 0
+      for j in i:
+         if j == True:
+            ntrue += 1
+      if ntrue >= len(i)/2.0:
+         xs.append(True)
+      else:
+         xs.append(False)
+   return inner_entropy(xs)
+
+def average_inner_entropy(col):
+   avg = 0
+   for i in col:
+      avg += inner_entropy(i)
+   return avg/len(col)
+
+def calculate_entropy(col):
+   return outer_entropy(col) * (1 - average_inner_entropy(col))
+   
+def matrix_entropy(matrix):
+   fitness = []
+   for r in matrix:
+      fitness.append(calculate_entropy(r[1:len(r)]))
+   return fitness
+      
+   
+
 r = read_receptors('receptors.txt')
-r.append(((0,0),(0,0)))
-z = [activate_receptor(img, i) for i in r]
-z = filter(lambda x:x==False, z)
-print str(z)
-         
+classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "!", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ".", "q", "?", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+m = quantify_receptors(r,classes)
+fitness = matrix_entropy(m)
+rx = zip(r,fitness)
+rx = filter(lambda (x,y): y > 0.8, rx)
+rx = map(lambda (x,y): x, rx)
+save_receptors(rx, 'iixreceptors.txt')
+#print str(m[0])
+#print str(calculate_entropy(m[0][1:len(m[0])]))
+#print str(m[1])
+#print str(calculate_entropy(m[1][1:len(m[1])]))
+#print str(m[2])
+#print str(calculate_entropy(m[2][1:len(m[2])]))
 
-#files = listdir(path)
-#print str(files)
-#for i in files:
-#   mypaste(path+i, (100,100))
+#img = Image.open('arial_a.png')
+#generate_receptors(img, 'receptors.txt',1000)
+#r = read_receptors('receptors.txt')
+#z = [activate_receptor(img, i) for i in r]
+         
 
