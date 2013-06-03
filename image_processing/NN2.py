@@ -46,7 +46,7 @@ def generate_weights(layers):
    #print str(thetas)
    #random epilson Theta numbers working properly
 
-def runNet(nn_params, hidden_layers, X, y, reg):
+def runNet(nn_params, hidden_layers, X, y):
    m = X.shape[0]
    if m != y.shape[0]:
       print "Must have the same number of training inputs as outputs"
@@ -60,11 +60,15 @@ def runNet(nn_params, hidden_layers, X, y, reg):
    prevSize = input_layer_size
    for i in range(0,len(hidden_layers)):
       thetas.append(nn_params[ii:ii + hidden_layers[i] * (prevSize + 1)])
-      thetas[i].resize(hidden_layers[i],(prevSize + 1))
+      thetas[i].resize(hidden_layers[i], (prevSize + 1))
+      #thetas[i].resize((prevSize+1), hidden_layers[i])
+      #thetas[i] = thetas[i].transpose()
       ii = hidden_layers[i] * (prevSize + 1)
       prevSize = hidden_layers[i]
    thetas.append(nn_params[ii:ii + output_layer_size * (prevSize + 1)])
-   thetas[len(thetas)-1].resize(output_layer_size,(prevSize + 1))
+   thetas[len(thetas)-1].resize(output_layer_size, (prevSize + 1))
+   #thetas[len(thetas)-1].resize((prevSize + 1), output_layer_size)
+   #thetas[len(thetas)-1] = thetas[len(thetas)-1].transpose()
 
 
 
@@ -89,8 +93,10 @@ def runNet(nn_params, hidden_layers, X, y, reg):
       prevNodes = hidden_as[i]
    
    ol = hidden_as[len(hidden_as)-1]   
+   print "Running network...\n"+str(ol)
 
 def nnCostFunction(nn_params, hidden_layers, X, y, reg):
+   #print "NN_params:\n"+str(nn_params)
    m = X.shape[0]
    if m != y.shape[0]:
       print "Must have the same number of training inputs as outputs"
@@ -104,14 +110,15 @@ def nnCostFunction(nn_params, hidden_layers, X, y, reg):
    prevSize = input_layer_size
    for i in range(0,len(hidden_layers)):
       thetas.append(nn_params[ii:ii + hidden_layers[i] * (prevSize + 1)])
-      thetas[i].resize((prevSize + 1), hidden_layers[i])
-      thetas[i] = thetas[i].transpose()
+      thetas[i].resize(hidden_layers[i], (prevSize + 1))
+      #thetas[i].resize((prevSize + 1), hidden_layers[i])
+      #thetas[i] = thetas[i].transpose()
       ii = hidden_layers[i] * (prevSize + 1)
       prevSize = hidden_layers[i]
    thetas.append(nn_params[ii:ii + output_layer_size * (prevSize + 1)])
    thetas[len(thetas)-1].resize(output_layer_size,(prevSize + 1))
-   thetas[len(thetas)-1].resize((prevSize + 1), output_layer_size)
-   thetas[len(thetas)-1] = thetas[len(thetas)-1].transpose()
+   #thetas[len(thetas)-1].resize((prevSize + 1), output_layer_size)
+   #thetas[len(thetas)-1] = thetas[len(thetas)-1].transpose()
 
 
 
@@ -138,18 +145,20 @@ def nnCostFunction(nn_params, hidden_layers, X, y, reg):
    ol = hidden_as[len(hidden_as)-1]   
    J = (1.0/m) * sum(-y * log(ol) - (1 - y) * log(1 - ol))
 
-   print "Theta1: \n"+str(thetas[0])
-   print "Thetas2: \n"+str(thetas[1])
+   #print "Theta1: \n"+str(thetas[0])
+   #print "Thetas2: \n"+str(thetas[1])
 
-   print "Output Layer: "+str(ol)
-   print "Unregularized J: "+str(J)
+   #print "Output Layer: "+str(ol)
+   #print "Unregularized J: "+str(J)
+
+
 
    #drop below to unregularize
    s = 0
    for t in thetas:
       s = s + sum(t[:,1:] * t[:,1:])
    J = J + ((reg*1.0)/(2*m)) * s
-   print "Regularized J: "+str(J)
+   #print "Regularized J: "+str(J)
 
    #print str(J)
    #cost function J working properly
@@ -171,9 +180,9 @@ def nnCostFunction(nn_params, hidden_layers, X, y, reg):
       theta_grads[i] = (1.0/m) * deltas_big[i] + ((reg*1.0)/m) * thetas[i]
       theta_grads[i][:,0] = theta_grads[i][:,0] - ((reg*1.0)/m) * thetas[i][:,0]
 
+   #print "ThetaGrads:\n"+str(unroll(theta_grads))
    return (J, theta_grads)
 
-#   print str(theta_grads)
 
 """
 %Backpropagation
@@ -219,17 +228,15 @@ def getGrad(nnparams, *args):
    answer = nnCostFunction(nnparams, layers, X, y, reg)[1]
    return unroll(answer)
 
-"""
 #Xor gate testing, 4 reals
-l = [2,2,2,1]
+l = [2,2,1]
 t = unroll(generate_weights(l))
-print "Making a [2,2,1,1] XOR gate"
+print "Making a [2,2,1] XOR gate"
 X = array([[0,0],[1,0],[0,1],[1,1]])
 y = array([[0], [1], [1], [0]])
-#nnCostFunction(t, [2,1], X, y, 1.0)
-args = ([2,2],X,y,1.0)
-#getJ(t, tup)
-res1 = optimize.fmin_cg(getJ, t, fprime=getGrad, args=args, maxiter=150)
-print 'res1 = ', res1
-runNet(res1, [2,2], X, y, 1.0)
-"""
+# Xor lambda should be ~ < 0.00001
+args = ([2], X, y, 0.00001)
+res1 = optimize.fmin_cg(getJ, t, fprime=getGrad, args=args, maxiter=500)#, gtol=0.0000000005)
+#print 'res1 = ', res1
+runNet(res1, [2], X, y)
+
