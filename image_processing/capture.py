@@ -178,6 +178,61 @@ def mypaste(fileName, (nx,ny)):
    new.save(fileName)
    
 
+
+def mypaste2(imgName, (nx,ny)):
+   img_old = resize2(imgName, (nx,ny))
+   cluster = firstCluster(img_old)
+   (minx, miny, maxx, maxy) = maxAndmins(cluster) 
+   lx = maxx - minx
+   ly = maxy - miny
+   dx = (nx-lx)/2
+   dy = (ny-ly)/2
+   cluster = map(lambda (x,y): (x+dx,y+dy), cluster)
+   new = Image.new(img_old.mode, (nx,ny), 255)
+   for c in cluster:
+      new.putpixel(c, 10)
+   return new
+
+
+
+def collectCharacters2(img):
+   imgs = []
+   x = img.size[0]
+   y = img.size[1]
+   myx = 0
+   myy = 0
+   i = 0
+   points = []
+   while (myx != x and myy != y):
+      point = (myx, myy)
+      cluster = getCluster(point, img)
+      if len(cluster) > 0:
+         points.append(point)
+         mnm = maxAndmins(cluster)
+         newImage = img.crop(mnm)
+         newImage.load()
+
+         newImage = mypaste2(newImage, (100,100))
+         newImage = resize2(newImage, (25,25))
+         #resize
+         
+        # print displayImage(newImage)
+         print "Appending cluster.."
+         imgs.append(newImage)
+         eraseCluster(cluster, img)
+      if (myx < x-1):
+         i += 1
+         myx += 1
+      elif (myy < y-1):
+         i += 1
+         myx = 0
+         myy += 1
+      else:
+         if (myx == x-1 and myy == y-1):
+            i += 1
+            myx += 1
+            myy += 1
+   return zip(points,imgs)
   
 def resize(fileName, (nx,ny)):
    img = Image.open(fileName)
@@ -196,10 +251,24 @@ def resize(fileName, (nx,ny)):
    #img.thumbnail(newSize, Image.ANTIALIAS)
    #img.save(fileName)
 
+def resize2(imgName, (nx,ny)):
+   img = imgName
+   (ix,iy) = img.size
+   while (ix*2 <= nx and iy*2 <= ny):
+      img = img.resize((ix*2,iy*2), Image.ANTIALIAS)
+      #(ix,iy) = img.size
+      ix = ix*2
+      iy = iy*2
+   while (ix/2 >= nx and iy/2 >= ny):
+      img = img.resize((ix/2,iy/2), Image.ANTIALIAS)
+      (ix,iy) = img.size
+   return img
+
 
 #collectCharacters(im)
 
 #im = Image.open("arial_0.png")
+"""
 paths = ['../images/arial_characters/','../images/comic_sans_characters/','../images/times_new_roman_characters/','../images/verdana_characters/','../images/courier_characters/']
 for path in paths:
    files = listdir(path)
@@ -208,6 +277,7 @@ for path in paths:
       resize(path+i, (20,20))
 #   mypaste(path+i, (100,100))
 print 'All done!' 
+"""
 
 #resize('arial_a.png', (20,20))
 

@@ -3,6 +3,9 @@
 import NN2
 import Image
 import numpy as np
+import sys
+sys.path.append("image_processing/")
+import capture as cap
 
 def imax(xs):
    m = max(xs)
@@ -14,8 +17,20 @@ def get_class_match(xs):
 
 theta = np.array(NN2.load_theta('625_39_ocr_theta.txt'))
 
+img_path = sys.argv[1]
+bimg = Image.open(img_path)
+tup = cap.collectCharacters2(bimg)
+tup.sort(key=lambda tup: tup[0][0])
+imgs = [y[1] for y in tup]
+s = ""
+for img in imgs:
+#   print str(img)
+   X = np.array(list(img.getdata()))
+#   print str(X.shape)
+   s = s + get_class_match(NN2.runNet(theta,[625,39],X)[0])
 
-img = Image.open('images/arial_characters/arial_v.png')
-X = np.array(list(img.getdata()))
-print get_class_match(NN2.runNet(theta,[625,39],X)[0])
+print s
+#img = Image.open('images/times_new_roman_characters/times_s.png')
+#X = np.array(list(img.getdata()))
+#print get_class_match(NN2.runNet(theta,[625,39],X)[0])
 
