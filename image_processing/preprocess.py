@@ -3,6 +3,7 @@ import Image
 from os import listdir
 from re import findall as findall
 from math import log as log
+from ast import literal_eval
 
 
 def generate_receptors(img, savefile, x):
@@ -111,6 +112,7 @@ def quantify_receptors(receptors, classes):
 #   print str(matrix)
    #Fill matrix
    for i in range(0,len(zlist)):
+      """
       img = Image.open('../images/courier_characters/'+zlist[i][0])
       for r in range(0,len(receptors)):
          matrix[r][i+1].append(activate_receptor(img, receptors[r]))
@@ -120,12 +122,15 @@ def quantify_receptors(receptors, classes):
       img = Image.open('../images/verdana_characters/'+zlist[i][2])
       for r in range(0,len(receptors)):
          matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      """
       img = Image.open('../images/arial_characters/'+zlist[i][3])
       for r in range(0,len(receptors)):
          matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      """
       img = Image.open('../images/comic_sans_characters/'+zlist[i][4])
       for r in range(0,len(receptors)):
          matrix[r][i+1].append(activate_receptor(img, receptors[r]))
+      """
    
    return matrix
    
@@ -168,9 +173,62 @@ def matrix_entropy(matrix):
    for r in matrix:
       fitness.append(calculate_entropy(r[1:len(r)]))
    return fitness
-      
+
+
+
+def get_pixel_set():
+   courier  = listdir('../images/courier_characters')
+   courier.sort()
+   times    = listdir('../images/times_new_roman_characters')
+   times.sort()
+   verdana  = listdir('../images/verdana_characters')
+   verdana.sort()
+   arial    = listdir('../images/arial_characters')
+   arial.sort()
+   comic    = listdir('../images/comic_sans_characters')
+   comic.sort()
+
+   zlist = zip(courier,times,verdana,arial,comic)
+   data = []
+
+   for i in range(0,len(zlist)):
+      img = Image.open('../images/courier_characters/'+zlist[i][0])
+      data.append(list(img.getdata()))
+      img = Image.open('../images/times_new_roman_characters/'+zlist[i][1])
+      data.append(list(img.getdata()))
+      img = Image.open('../images/verdana_characters/'+zlist[i][2])
+      data.append(list(img.getdata()))
+      img = Image.open('../images/arial_characters/'+zlist[i][3])
+      data.append(list(img.getdata()))
+      img = Image.open('../images/comic_sans_characters/'+zlist[i][4])
+      data.append(list(img.getdata()))
+
+   return data
+
+
+def save_pixeldata(data):
+   f = open('pixeldata.txt', 'w')
+   s = "data\n"+str(data)+"\n"
+   f.write(s)
+   f.close
+
+def read_pixeldata():
+   f = open('pixeldata.txt', 'r+')
+   lines = f.readlines()
+   i = literal_eval(lines[1])
+   f.close
+   return i
+
+def apply_receptors_to_directory(receptor_path, img_dir):
+   files = listdir(img_dir)   
+   receptors = read_receptors(receptor_path)
+
+
+
+save_pixeldata(get_pixel_set())
+
+"""      
 #generate 10k receptor dataset
-"""   
 img = Image.open('arial_a.png')
 generate_receptors(img, 'receptors.txt',5000)
 print "10k receptors generated"
@@ -182,11 +240,11 @@ fitness = matrix_entropy(m)
 rx = zip(r,fitness)
 rx = filter(lambda (x,y): y > 0.8, rx)
 rx = map(lambda (x,y): x, rx)
-save_receptors(rx, 'iixreceptors.txt')
+save_receptors(rx, 'Aiixreceptors.txt')
+"""
 """
 #generate 100 best receptors
-"""
-r = read_receptors('iixreceptors.txt')
+r = read_receptors('Aiixreceptors.txt')
 classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "!", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", ".", "q", "?", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 m = quantify_receptors(r,classes)
 fitness = matrix_entropy(m)
@@ -195,6 +253,6 @@ rx.sort(key=lambda tup: tup[1])
 rx.reverse()
 rx = map(lambda (x,y): x, rx)
 best100 = rx[0:100]
-save_receptors(best100, 'best100.txt')
+save_receptors(best100, 'Abest100.txt')
 """
 

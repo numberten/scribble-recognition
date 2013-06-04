@@ -200,14 +200,16 @@ def resize(fileName, (nx,ny)):
 #collectCharacters(im)
 
 #im = Image.open("arial_0.png")
-path = '../images/verdana_characters/'
-#files = listdir(path)
+paths = ['../images/arial_characters/','../images/comic_sans_characters/','../images/times_new_roman_characters/','../images/verdana_characters/','../images/courier_characters/']
+for path in paths:
+   files = listdir(path)
 #print str(files)
-#for i in files:
+   for i in files:
+      resize(path+i, (20,20))
 #   mypaste(path+i, (100,100))
-#print 'All done!' 
+print 'All done!' 
 
-#= resize('arial_0.png', (100,100))
+#resize('arial_a.png', (20,20))
 
 #collectCharacters(im)
 
