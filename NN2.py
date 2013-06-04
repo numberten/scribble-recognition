@@ -48,13 +48,12 @@ def generate_weights(layers):
 
    #random epilson Theta numbers working properly
 
-def runNet(nn_params, hidden_layers, X, y):
+def runNet(nn_params, layers, X):
    m = X.shape[0]
-   if m != y.shape[0]:
-      print "Must have the same number of training inputs as outputs"
-      return 0
-   input_layer_size = X.shape[1]
-   output_layer_size = y.shape[1]
+   X = X.reshape(1,m)
+   input_layer_size = layers[0]
+   output_layer_size = layers[len(layers)-1]
+   hidden_layers = layers[1:len(layers)-2]
 
    #re-roll nn_params into individuals thetas
    thetas = []
@@ -63,25 +62,13 @@ def runNet(nn_params, hidden_layers, X, y):
    for i in range(0,len(hidden_layers)):
       thetas.append(nn_params[ii:ii + hidden_layers[i] * (prevSize + 1)])
       thetas[i].resize(hidden_layers[i], (prevSize + 1))
-      #thetas[i].resize((prevSize+1), hidden_layers[i])
-      #thetas[i] = thetas[i].transpose()
       ii = hidden_layers[i] * (prevSize + 1)
       prevSize = hidden_layers[i]
    thetas.append(nn_params[ii:ii + output_layer_size * (prevSize + 1)])
    thetas[len(thetas)-1].resize(output_layer_size, (prevSize + 1))
-   #thetas[len(thetas)-1].resize((prevSize + 1), output_layer_size)
-   #thetas[len(thetas)-1] = thetas[len(thetas)-1].transpose()
-
-
-
-   #Set return values
-   J = 0
-   theta_grads = []
-   for i in range(0,len(thetas)):
-      theta_grads.append(zeros(thetas[i].shape))
 
    #Feed forward
-   nX = append(ones((m,1)),X,axis=1)
+   nX = append(ones((1,1)),X,axis=1)
    hidden_zs = []
    hidden_as = []
 
