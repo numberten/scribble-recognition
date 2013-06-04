@@ -78,6 +78,7 @@ class NeuralNet:
       current_iteration    = 0
       self.current_error   = error + 1
       while True:
+         print "Iteration: "+str(current_iteration)
          if current_iteration >= iterations:
             print "finished training neural net"
             print "error: "+ str(self.current_error)
@@ -97,7 +98,7 @@ class NeuralNet:
             delta_ks = []
             for k in range(0,len(self.neurons[len(self.neurons)-1])):
                ko = self.neurons[len(self.neurons)-1][k]
-               delta_ks.append(ko * (1 - ko) * (ko - outputs[q][k]))
+               delta_ks.append(ko - outputs[q][k]) #delta_ks.append(ko * (1 - ko) * (ko - outputs[q][k]))
             #Step 3: Calculate delta-j for every hidden node j
             delta_js = []
             for i in range(1,len(self.neurons)-1):
@@ -141,6 +142,7 @@ class NeuralNet:
             summ += (self.neurons[len(self.neurons)-1][o] - outputs[i][o])**2
       self.current_error = 0.5 * summ
       self.f.write(str(self.current_error)+','+str(self.global_i)+'\n')
+      print "Error: "+str(self.current_error)
       self.global_i += 1
 
    def save_network(self,savefile):   
@@ -158,7 +160,6 @@ def load_network(savefile):
    f.close
    return network
 
-"""
 print "Creating a [2,2,3,1] neural network."
 print "Training network with XOR gate examples."
 print "alpha = 0.03, max iterations = 150000, error = 0.08"
@@ -177,8 +178,6 @@ a.printo()
 print "[0,1]"
 a.run([0,1])
 a.printo()
-"""
-
 
 
 

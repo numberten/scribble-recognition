@@ -9,18 +9,21 @@ def sigmoid(x):
    return 1/(1+e**-x)
 
 def msigmoid(x):
-   v = vectorize(lambda z: 1/(1+e**-z))
+   v = vectorize(lambda z: 1/(1+e**-helper(z)))
    return v(x)
 
+def helper(x):
+   #print str(x)
+   if x < -700:
+      return -700
+   return x
+
 def sigmoidGradient(x):
-   return msigmoid(x) * (1 - msigmoid(x)); 
+   return msigmoid(x) * (1 - msigmoid(x));
 
+def safe_ln(x, minval=0.0000000001):
+    return log(x.clip(min=minval))
 
-#function [J grad] = nnCostFunction(nn_params, ...
-#                                   input_layer_size, ...
-#                                   hidden_layer_size, ...e
-#                                   num_labels, ...
-#                                   X, y, lambda)
 def generate_weights(layers):
    input_layer_size = layers[0]
    output_layer_size = layers[len(layers)-1]
@@ -43,7 +46,6 @@ def generate_weights(layers):
    thetas[len(thetas)-1].resize(output_layer_size,(prevSize + 1))
    return thetas
 
-   #print str(thetas)
    #random epilson Theta numbers working properly
 
 def runNet(nn_params, hidden_layers, X, y):
@@ -93,7 +95,8 @@ def runNet(nn_params, hidden_layers, X, y):
       prevNodes = hidden_as[i]
    
    ol = hidden_as[len(hidden_as)-1]   
-   print "Running network...\n"+str(ol)
+   #print "Running network...\n"+str(ol)
+   return ol
 
 def nnCostFunction(nn_params, hidden_layers, X, y, reg):
    #print "NN_params:\n"+str(nn_params)
@@ -143,7 +146,7 @@ def nnCostFunction(nn_params, hidden_layers, X, y, reg):
       prevNodes = hidden_as[i]
    
    ol = hidden_as[len(hidden_as)-1]   
-   J = (1.0/m) * sum(-y * log(ol) - (1 - y) * log(1 - ol))
+   J = (1.0/m) * sum(-y * safe_ln(ol) - (1 - y) * safe_ln(1 - ol))
 
    #print "Theta1: \n"+str(thetas[0])
    #print "Thetas2: \n"+str(thetas[1])
@@ -184,33 +187,6 @@ def nnCostFunction(nn_params, hidden_layers, X, y, reg):
    return (J, theta_grads)
 
 
-"""
-%Backpropagation
-delta_3 = ol - y;
-delta_2 = delta_3 * Theta2(:,2:end);
-delta_2 = delta_2 .* sigmoidGradient(phl);
-
-big_delta_2 = delta_3' * hl;
-big_delta_1 = delta_2' * nX;
-
-Theta1_grad = (1/m) * big_delta_1 + (lambda/m) * Theta1;
-Theta2_grad = (1/m) * big_delta_2 + (lambda/m) * Theta2;
-
-Theta1_grad(:,1) = Theta1_grad(:,1) - (lambda/m)*Theta1(:,1);
-Theta2_grad(:,1) = Theta2_grad(:,1) - (lambda/m)*Theta2(:,1);
-
-
-%Feedforward
-nX = [ones(m,1),X];
-phl = nX * Theta1'; %should be size(25,5000)
-hl = [ones(m,1),sigmoid(phl)]; %should be size (5000, 26)
-ol = hl * Theta2'; %should be size(10,5000)
-ol = sigmoid(ol);
-y = eye(num_labels)(y,:); %turn each y (0-9) into a vector of 0's and 1's
-J = (1/m) * sum(sum(-y .* log(ol) - (1 - y) .* log(1 - ol)));
-%Regularization
-J = J + (lambda/(2*m)) * (sum(sum(Theta1(:,2:end) .* Theta1(:,2:end))) + sum(sum(Theta2(:,2:end) .* Theta2(:,2:end))));
-"""
 def unroll(xs):
    acc = xs[0].ravel()
    for i in range(1,len(xs)):
@@ -228,6 +204,26 @@ def getGrad(nnparams, *args):
    answer = nnCostFunction(nnparams, layers, X, y, reg)[1]
    return unroll(answer)
 
+def save_theta(filename, theta):
+   st = "["+str(theta[0])
+   for i in theta[1:len(theta)]:
+      st = st + ","+str(i)
+   st = st+"]"
+      
+   f = open(filename, 'w')
+   s = "theta\n"+st+"\n"
+   f.write(s)
+   f.close
+
+
+def load_theta(filename):
+   f = open(filename, 'r+')
+   lines = f.readlines()
+   theta = literal_eval(lines[1])
+   return theta
+
+
+"""
 #Xor gate testing, 4 reals
 l = [2,2,1]
 t = unroll(generate_weights(l))
@@ -236,7 +232,8 @@ X = array([[0,0],[1,0],[0,1],[1,1]])
 y = array([[0], [1], [1], [0]])
 # Xor lambda should be ~ < 0.00001
 args = ([2], X, y, 0.00001)
+
 res1 = optimize.fmin_cg(getJ, t, fprime=getGrad, args=args, maxiter=500)#, gtol=0.0000000005)
 #print 'res1 = ', res1
-runNet(res1, [2], X, y)
-
+print "Output: \n"+str(runNet(res1, [2], X, y))
+"""
